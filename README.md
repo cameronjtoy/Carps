@@ -1,18 +1,41 @@
-# Carps — compare car part prices
+# Carps — plan car builds, check fitment, compare prices
 
-A PCPartPicker-style proof of concept for basic car maintenance parts: pick your vehicle, browse a
-sortable/filterable table of parts, compare prices across retailers, and build a shareable parts list.
+A PCPartPicker-style site for car people: pick your car, browse performance and maintenance parts in
+sortable/filterable tables, check fitment, and plan builds with live compatibility checks and price totals.
 
-> **Prices in this POC are generated sample data**, not live retailer quotes.
+> **Prices, part numbers, specs and power gains in this POC are generated sample data.**
 
 ## Features (POC)
 
-- **Vehicle selector** (Year → Make → Model → Engine), remembered in the browser; parts show *Fits / Doesn't fit*.
-- **Category tables** for oil filters, engine oil, air & cabin filters, brake pads, spark plugs, wiper blades and batteries —
-  sort any column; filter by search, brand, max price, rating, in-stock and fitment.
-- **Part page** with a price comparison across retailers (best in-stock price highlighted).
-- **My List** — one part per category with a running total and a share link (`#/list?parts=…`).
-- Works on phones (tables collapse into cards) and in dark mode.
+**Vehicle-aware browsing**
+- Year → Make → Model → Trim picker with enthusiast specs (chassis code, power, weight, bolt pattern,
+  center bore, stock wheel/tire). Platforms include Civic Si (FC1), GR86 (ZN8), MX-5 (ND2), WRX (VA),
+  Golf GTI (Mk7), Mustang GT (S550), F-150 and Silverado, plus everyday cars.
+- 23 categories in 5 sections: **Power** (intakes, exhaust, headers/downpipes, intercoolers, turbo/supercharger,
+  tunes, clutches), **Chassis & Brakes** (coilovers, springs, sway bars, big brake kits), **Wheels & Tires**,
+  **Aero & Interior**, and **Maintenance**.
+- Every part shows **Fits / Check fit / No fit**, with the reasons on hover. Platform parts use a fitment list;
+  wheels are checked by bolt pattern, center bore, brake clearance and poke vs. stock; tires by rim size and
+  overall diameter; big brake kits by minimum wheel size.
+- Tables: est. hp/tq gain, weight change, emissions status (CARB / 50-state / off-road), "needs tune",
+  install difficulty, rating, best price. Filters for every spec column (size, offset, bolt pattern, damping…),
+  emissions, tune required, difficulty, brand, price and stock.
+
+**Build planner**
+- Multiple saved builds (rename, duplicate, delete), a goal (Daily, Track, Drift…), quantities (4 wheels, 4 tires).
+- **Compatibility checker**: tire ↔ wheel diameter and width, tire diameter/speedo error, BBK ↔ wheel size,
+  coilovers + springs conflict, parts that need a tune, clutch torque capacity vs. estimated torque,
+  automatic-only cars, wheel poke on lowered cars, hub-centric rings, seat rails, and emissions
+  (errors when "I live in a CARB state" is on).
+- Stats: estimated hp/torque (with diminishing returns), curb weight change, lb/hp, parts total at best prices,
+  and estimated install labor.
+- Share link (`#/build?share=…`) that anyone can open and save.
+
+**Also**
+- Featured builds gallery (sample builds you can clone).
+- Wheel & tire fitment calculator: poke, inner clearance, overall diameter, speedo error, sidewall,
+  recommended tire width, with a cross-section diagram.
+- Phone layout (tables collapse into cards) and dark mode.
 
 ## Run locally
 
@@ -37,12 +60,15 @@ If you rename the repo, update `base` in `vite.config.ts`.
 ```
 src/
   api/index.ts         data access layer — the only file that changes for Supabase
-  data/seed.ts         mock categories, vehicles, parts, retailers, prices, fitments
-  lib/pricing.ts       best-price, filter and total logic (+ tests)
-  context/             selected vehicle + parts list (localStorage)
-  components/          Header, VehicleSelector, PartsTable (TanStack Table), FilterSidebar, PriceTable…
-  pages/               Home, CategoryPage, PartPage, ListPage
-supabase/schema.sql    tables + read-only RLS policies matching src/types.ts
+  data/                vehicles, catalog, maintenance + performance part templates, retailers, featured builds
+  lib/fitment.ts       wheel/tire math and per-part fitment rules (+ tests)
+  lib/compat.ts        build compatibility engine (+ tests)
+  lib/buildStats.ts    power / weight / cost / labor estimates
+  lib/pricing.ts       best price, joins, table filters (+ tests)
+  context/             selected vehicle + saved builds (localStorage)
+  components/          PartsTable (TanStack Table), FilterSidebar, BuildTable, CompatPanel, StatsCards…
+  pages/               Home, CategoryPage, PartPage, BuildPage, BuildsPage, FitmentTool
+supabase/schema.sql    catalog tables (public read) + user builds (owner write) matching src/types.ts
 ```
 
 ## Hooking up Supabase (later)
@@ -65,11 +91,13 @@ supabase/schema.sql    tables + read-only RLS policies matching src/types.ts
 - Product images and normalized specs.
 
 **Product**
-- Accounts (Supabase Auth): a "garage" of saved vehicles, saved/public lists.
+- Accounts (Supabase Auth): a "garage" of saved vehicles; builds synced to the `builds` tables; public build pages.
+- Build photos, dyno sheets and a progress log (installed / ordered / planned per part).
+- More compatibility rules: fuel system limits (injectors/pump) for big power, intercooler piping,
+  staggered setups, tire load index / lift kits for trucks, brake pad ↔ caliper pairing.
 - Price-history charts and price-drop email alerts.
 - Maintenance schedules per vehicle (what's due at 30k miles) that pre-fill a list.
 - Compare parts side by side, user reviews, shipping/tax/coupon-aware totals, local pickup availability.
-- Multiple quantities per list (e.g. 2 wiper blades, 5 qt + 1 qt oil).
 - Admin page to curate parts/retailers.
 
 **Business / tech**

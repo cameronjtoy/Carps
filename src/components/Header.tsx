@@ -1,9 +1,9 @@
 import { Link, NavLink } from 'react-router-dom';
-import { useList } from '../context/ListContext';
+import { useBuild } from '../context/BuildContext';
 import { VehicleSelector } from './VehicleSelector';
 
 export function Header() {
-  const { count } = useList();
+  const { count } = useBuild();
   return (
     <header className="site-header">
       <div className="container header-inner">
@@ -13,8 +13,10 @@ export function Header() {
         </Link>
         <nav className="main-nav">
           <NavLink to="/" end>Browse</NavLink>
-          <NavLink to="/list">
-            My List {count > 0 && <span className="badge">{count}</span>}
+          <NavLink to="/builds">Builds</NavLink>
+          <NavLink to="/tools/fitment">Fitment</NavLink>
+          <NavLink to="/build" className="nav-build">
+            My Build {count > 0 && <span className="badge">{count}</span>}
           </NavLink>
         </nav>
         <div className="header-vehicle">
@@ -22,7 +24,7 @@ export function Header() {
         </div>
       </div>
       <div className="demo-banner">
-        Proof of concept — prices shown are sample data, not live retailer quotes.
+        Proof of concept — prices, part numbers, specs and gains are sample data.
       </div>
     </header>
   );

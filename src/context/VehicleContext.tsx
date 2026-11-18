@@ -41,3 +41,4 @@ export function useVehicle() {
 }
 
 export const vehicleLabel = (v: Vehicle) => `${v.year} ${v.make} ${v.model}`;
+export const vehicleFull = (v: Vehicle) => `${v.year} ${v.make} ${v.model} ${v.trim} (${v.chassis})`;

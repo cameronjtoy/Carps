@@ -30,7 +30,7 @@ export function VehicleSelector({ compact = false }: { compact?: boolean }) {
       <div className="vehicle-chip">
         <span aria-hidden>🚗</span>
         <span>
-          {vehicleLabel(vehicle)} <small>{vehicle.engine}</small>
+          {vehicleLabel(vehicle)} <small>{vehicle.trim} · {vehicle.chassis}</small>
         </span>
         <button className="link" onClick={() => setVehicleId(null)}>
           Change
@@ -58,9 +58,9 @@ export function VehicleSelector({ compact = false }: { compact?: boolean }) {
         <option value="">Model</option>
         {models.map((m) => <option key={m}>{m}</option>)}
       </select>
-      <select aria-label="Engine" value={vehicle && engines.some((e) => e.id === vehicle.id) ? vehicle.id : ''} disabled={!model} onChange={(e) => setVehicleId(e.target.value || null)}>
-        <option value="">Engine</option>
-        {engines.map((v) => <option key={v.id} value={v.id}>{v.engine}</option>)}
+      <select aria-label="Trim" value={vehicle && engines.some((e) => e.id === vehicle.id) ? vehicle.id : ''} disabled={!model} onChange={(e) => setVehicleId(e.target.value || null)}>
+        <option value="">Trim / engine</option>
+        {engines.map((v) => <option key={v.id} value={v.id}>{v.trim} · {v.engine} ({v.chassis})</option>)}
       </select>
     </div>
   );
